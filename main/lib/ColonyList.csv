@@ -1,0 +1,31 @@
+Species,Genotype
+mouse,A3C+/Gnat1+/-
+mouse,A3C+;Gnat1-/-;Gnat2-/-
+mouse,A3C+;Gnat1+/-;Gnat2-/-
+mouse,BK+/-
+mouse,CNGB neo/neo
+mouse,CNGB neo/neo; Cre
+mouse,Cx129+/-
+mouse,Cx36-/-
+mouse,Cx36-/-;Gnat1-/-
+mouse,D-Cam-/-
+mouse,E122Q-/-
+mouse,ELFN-/-
+mouse,ELFN+/-
+mouse,ELFN1-/-
+mouse,ELFN1+/-
+mouse,ELFN1+/-;CX36+/-
+mouse,Gnat1-/-
+mouse,Gnat1-/-;Gcaps-/-
+mouse,Gnat2-/-
+mouse,HCN1-/-
+mouse,HCN1+/-
+mouse,LRIT1-/-
+mouse,LRIT1-/-;Gnat1-/-
+mouse,MCV8
+mouse,PDE6-a NCBS/NCBS
+mouse,R9AP95  
+mouse,Rh-/-
+mouse,TrU/Gnat1-/-
+mouse,TrU+;Gnat1-/-
+lamprey,WT
