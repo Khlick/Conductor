@@ -5,9 +5,7 @@ classdef CustomStartup < appbox.Settings
   end
   
   properties (Constant=true)
-    version = 2
-    build = 0
-    revision = 10
+    version = 2.0
   end
   
   properties (SetAccess = private)
@@ -31,8 +29,6 @@ classdef CustomStartup < appbox.Settings
   
   properties (Dependent)
     nUsers
-    Version
-    Release
   end
   
   
@@ -107,13 +103,6 @@ classdef CustomStartup < appbox.Settings
       obj.put('setup', v);
     end
     
-    function v = get.Version(obj)
-      v = obj.version;
-    end
-    function v = get.Release(obj)
-      v = sprintf("%1d.%d.%2d",obj.version,obj.build,obj.revision);
-    end
-
     function reset(obj)
       import admin.startup.CustomStartup;
       reset@appbox.Settings(obj);

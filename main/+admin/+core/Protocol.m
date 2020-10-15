@@ -282,7 +282,6 @@ classdef (Abstract) Protocol < symphonyui.core.Protocol & dynamicprops
     
     function completeEpoch(obj, epoch)
       completeEpoch@symphonyui.core.Protocol(obj,epoch);
-      
       %look for temperature
       [hasTempMon,~] = obj.rigHasDeviceType('temperature');
       if hasTempMon
@@ -386,6 +385,44 @@ classdef (Abstract) Protocol < symphonyui.core.Protocol & dynamicprops
       % By default, tf is true.
       [tf,msg] = isValid@symphonyui.core.Protocol(obj);
       
+    end
+    
+    %% Overriding applyPreset to skip local checks
+    
+    function applyPreset(obj, preset)
+      if ~isempty(preset.protocolId) && ~strcmp(preset.protocolId, class(obj))
+        error('Protocol ID mismatch');
+      end
+      %obj.setPropertyMap(preset.propertyMap);
+      obj.forceProperyFromMap(preset.propertyMap);
+    end
+    
+    function forceProperyFromMap(obj, map)
+      % forcepropertyfrommap replaces the setpropertymap > setproperty flow
+      exception = [];
+      names = map.keys;
+      for i = 1:numel(names)
+        try
+          %obj.setProperty(names{i}, map(names{i}));
+          mpo = findprop(obj, names{i});
+          if isempty(mpo) || ~strcmp(mpo.SetAccess, 'public')
+            error([names{i} ' is not a property with public set access']);
+          end
+          descriptor = obj.getPropertyDescriptor(names{i});
+          if ~descriptor.type.canAccept(map(names{i}))
+            error([map(names{i}) ' does not conform to property type restrictions for ' names{i}]);
+          end
+          obj.(names{i}) = map(names{i});
+        catch x
+          if isempty(exception)
+            exception = MException('symphonyui:core:Protocol', 'Failed to set one or more property values');
+          end
+          exception = exception.addCause(x);
+        end
+      end
+      if ~isempty(exception)
+        throw(exception);
+      end
     end
     
   end
