@@ -2,51 +2,15 @@ function updateUser()
 
 % Load Symphony and the package into the path
 import matlab.internal.apputil.AppUtil
-import appbox.screenCenter
 import admin.utils.rep
 
 packageRoot = admin.utils.getPackageRoot();
 [~,lab,~] = fileparts(packageRoot);
 
 % Locate Symphony and add it to the path
-infos = AppUtil.getAllAppsInDefaultLocation;
-if isempty(infos)
-  error( ...
-    "SETUPSYMPHONY:NOTINSTALLED", ...
-    "Install Symphony available from '%s'", ...
-    'https://symphony-das.github.io/' ...
-    );
+if isempty(which('Symphony.Core.SymphonyFramework')) 
+  importSymphony();
 end
-
-appIndex = AppUtil.findAppIDs( ...
-  {infos.id}, ...
-  'SymphonyAPP', ...
-  false ...
-  );
-appInfo = infos(appIndex);
-
-% make sure Symphony is installed
-if isempty(appInfo)
-  error( ...
-    "SETUPSYMPHONY:NOTINSTALLED", ...
-    "Install Symphony available from '%s'", ...
-    'https://symphony-das.github.io/' ...
-    );
-end
-
-% app location string
-appinstalldir = appInfo.location;
-
-% generate the file path
-apppath = java.io.File(appinstalldir);
-
-resourcesfolder = matlab.internal.ResourcesFolderUtils.FolderName;
-canonicalpathtocodedir = fullfile(char(apppath.getCanonicalPath()));
-allpaths = AppUtil.genpath(canonicalpathtocodedir);
-
-% do not allow resources or metadata folders to be added to the path
-allpaths = strsplit(allpaths,pathsep);
-allpaths(contains(allpaths,{resourcesfolder,'metadata'})) = [];
 
 % append the package folder to the path
 here = fullfile(packageRoot,'main');
@@ -98,6 +62,8 @@ end
 
 container.Name = 'Update User Setups';
 container.Position = appbox.screenCenter(w,h);
+
+cu = onCleanup(@()delete(container));
 
 %main layout
 layout = uix.HBox('Parent',container,'Spacing',3,'Padding',5);
@@ -186,8 +152,9 @@ uiwait(container);
         warning('CONDUCTOR:UPDATEUSER',"Could not update for reason: '%s'",ME.message);
         return
       end
+      pause(0.01);
+      uiwait(msgbox(sprintf('Updated: %s > %s',u, d{st,1}),'Success'));
     end
-    msgbox({'Updated:';sprintf('%s > %s',u, d{st,1})},'Success');
   end
 
   function doClose()
