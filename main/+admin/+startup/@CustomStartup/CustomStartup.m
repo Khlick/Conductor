@@ -5,7 +5,7 @@ classdef CustomStartup < appbox.Settings
   end
   
   properties (Constant=true)
-    version = 2.0
+    version = 2.1
   end
   
   properties (SetAccess = private)
@@ -23,8 +23,8 @@ classdef CustomStartup < appbox.Settings
   end
   
   properties %(Access = private)
-    userMap   = containers.Map()
-    uiMap     = containers.Map()
+    userMap
+    uiMap
   end
   
   properties (Dependent)
@@ -39,6 +39,9 @@ classdef CustomStartup < appbox.Settings
       [~,rootName,~] = fileparts(root);
       obj = obj@appbox.Settings(sprintf('conductor_startup_%s',rootName),'symphonyui');
       import admin.startup.CustomStartup;
+      
+      obj.userMap = containers.Map();
+      obj.uiMap   = containers.Map();
       
       if ~isfolder(root), error('Please provide valid root directory.'); end
       obj.rootFolder = root;

@@ -356,6 +356,7 @@ classdef DeviceConfigurator < admin.core.modules.Module
       % ONSETBACKGROUND Sets the output device background value immediately.
       p = event.Property;
       device = obj.configurationService.getDevice(p.Name);
+      
       background = device.background;
       device.background = symphonyui.core.Measurement(p.Value, ...
         device.background.displayUnits);

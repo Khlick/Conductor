@@ -33,7 +33,8 @@ classdef dualStimPreview < symphonyui.core.ProtocolPreview
         end
         
         function update(obj)
-          import admin.figures.*;
+          import admin.figures.dualStimPreview;
+          
           yyaxis(obj.axes,'left');  
           cla(obj.axes);
           yyaxis(obj.axes,'right');
@@ -59,30 +60,27 @@ classdef dualStimPreview < symphonyui.core.ProtocolPreview
 
           %plot
           labs = cell(2,size(stimuli,2));
-          %{
-          cols = get(obj.axes,'colororder');
-          if size(stimuli,2) > size(cols,1)
-            cols = repmat(cols,ceil(size(stimuli,2)/size(cols,1)),1);
-          end
-          %}
+          
           for v = 1:size(stimuli,2)
             emptyVec = cellfun(@isempty,stimuli(:,v),'unif',1);
             [x,y,l] = cellfun(...
-              @(x)admin.figures.stimPreview.doGetData(x), ...
+              @(x)dualStimPreview.doGetData(x), ...
               stimuli(~emptyVec,v), 'unif',0);
             yyaxis(obj.axes,'left');
-            line(x{1},y{1},'Parent',obj.axes);%, 'Color', cols(v,:));
+            line(x{1},y{1},'Parent',obj.axes);
             
             yyaxis(obj.axes,'right');
-            line(x{2},y{2},'Parent',obj.axes);%, 'Color', cols(v,:));
+            line(x{2},y{2},'Parent',obj.axes);
 
             labs(:,v) = l(:);
           end
           ylabel(obj.axes, strjoin(unique(labs(2,:)), ', '), 'Interpreter', 'none');
-          %ylim(obj.axes,[0,obj.axes.YLim(2)*1.1]);
+          dom = obj.axes.YLim;
+          ylim(obj.axes,dom + [-0.1,0.1].*diff(dom));
           yyaxis(obj.axes,'left');  
           ylabel(obj.axes, strjoin(unique(labs(1,:)), ', '), 'Interpreter', 'none');
-          %ylim(obj.axes,[0,obj.axes.YLim(2)*1.1]);
+          dom = obj.axes.YLim;
+          ylim(obj.axes,dom + [-0.1,0.1].*diff(dom));
         end
         
     end

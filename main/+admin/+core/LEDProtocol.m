@@ -347,7 +347,7 @@ classdef (Abstract) LEDProtocol < admin.core.Protocol & dynamicprops
           end
         end
         if ~tf(a)
-          msg{a} = sprintf('Amplitdues exceed allowed maximum on "%s"',led.name);
+          msg{a} = sprintf('%g exceeds allowed maximum on "%s"',ap,led.name);
         end
       end
       

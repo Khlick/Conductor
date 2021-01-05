@@ -468,7 +468,7 @@ classdef (Abstract) Protocol < symphonyui.core.Protocol & dynamicprops
       for d = 1:numel(devices)
         if isa(devices{d},'admin.core.devices.Device')
           if ~strcmpi(devices{d}.deviceType,'Amplifier')
-            continue;
+            continue
           end
           nameList{d} = devices{d}.name;
         elseif isa(devices{d},'admin.devices.Axopatch200B')

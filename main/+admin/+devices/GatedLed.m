@@ -1,6 +1,7 @@
 classdef GatedLed < admin.core.devices.Device
-  
-  
+  % GATEDLED A LED which only operates on a digital port.
+  % Required inputs to 'digitalStream' and 'bitPosition', optionally provide
+  % wavelength.
   methods
     
     function obj = GatedLed(name,daq,varargin)

@@ -1,5 +1,9 @@
 classdef LedDevice < admin.core.devices.Device
   
+  properties (Constant,Hidden)
+    VOLTAGE_TOLERANCE = 0.2 % Allowance exceeding maximum
+  end
+  
   properties (Transient,Hidden)
     maxVoltage = Inf
   end
@@ -153,7 +157,7 @@ classdef LedDevice < admin.core.devices.Device
     end
     
     function tf = canAcceptVoltage(obj,v)
-      tf = (v <= obj.maxVoltage) & (v >= 0);
+      tf = (v <= (obj.maxVoltage+obj.VOLTAGE_TOLERANCE)) & (v >= 0);
     end
     
   end
