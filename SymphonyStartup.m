@@ -101,4 +101,11 @@ startupData.(userInfo.user) = userStruct;
 userInfo.save();
 save([labName,'.sy2'],'startupData','userInfo','-v7.3');
 
+% remove main\+conductor
+contents = dir(fullfile(rootPath,'main','+*'));
+contents(contains({contents.name},'admin')) = [];
+if ~isempty(contents)
+  rmdir(fullfile(contents.folder,contents.name),'s');
+end
+
 cd(fullfile(rootPath,userInfo.user,userInfo.setup));

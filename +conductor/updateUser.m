@@ -1,4 +1,7 @@
 function updateUser()
+% UPDATEUSER Update a user setup from the packaged templates.
+% Modified files, rigs, sources, protocols are overwritten but any file with an
+% unmatched name are left unmodified.
 
 % Load Symphony and the package into the path
 import matlab.internal.apputil.AppUtil
@@ -14,7 +17,7 @@ end
 
 % append the package folder to the path
 here = fullfile(packageRoot,'main');
-pathsToAdd = strjoin([allpaths,{genpath(here)}],pathsep);
+pathsToAdd = genpath(here);
 
 % add the app to the MATLAB path
 addpath(pathsToAdd);
