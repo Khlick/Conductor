@@ -3,9 +3,9 @@ function updateUser()
 % Modified files, rigs, sources, protocols are overwritten but any file with an
 % unmatched name are left unmodified.
 
+conductor.import();
 % Load Symphony and the package into the path
 import matlab.internal.apputil.AppUtil
-import admin.utils.rep
 
 packageRoot = admin.utils.getPackageRoot();
 [~,lab,~] = fileparts(packageRoot);
@@ -106,7 +106,7 @@ rigTable = uitable( ...
   'RowName', [], ...
   'ColumnName', {'Rig Name', 'Update Type'} ...
   );
-rigTable.Data = [firstSetup(:),rep({'N/C'},numel(firstSetup))];
+rigTable.Data = [firstSetup(:),admin.utils.rep({'N/C'},numel(firstSetup))];
 rigTable.TooltipString = sprintf( ...
   '%s.\n%s.', ...
   'Rig Name: Rig configuraion a name', ...
@@ -166,8 +166,6 @@ uiwait(container);
   end
 
   function updateUserSelection(src,evt)
-    import admin.utils.rep
-    
     node = evt.Nodes;
     if strcmp(node.Name,lab)
       
@@ -180,7 +178,7 @@ uiwait(container);
     
     % update the setups table from the new user selection
     st = uMap(newNode.Name);
-    rigTable.Data = [st(:),rep({'N/C'},numel(st))];
+    rigTable.Data = [st(:),admin.utils.rep({'N/C'},numel(st))];
   end
 
   function [userMap,users] = getUserMap()

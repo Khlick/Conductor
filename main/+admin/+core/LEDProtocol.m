@@ -155,6 +155,34 @@ classdef (Abstract) LEDProtocol < admin.core.Protocol & dynamicprops
               fprintf(2,'No input streams for %s (%s).\n',device.name,class(obj));
             end
           end
+        case 'monitorBackground'
+          if value
+            % if setting to true, make sure we have an available stream to
+            % record from.
+            device = obj.rig.getDevice(obj.led2);
+            if ~device.hasInputStream()
+              value = false;
+              fprintf(2,'No input streams for %s (%s).\n',device.name,class(obj));
+            end
+          end
+        case 'led1'
+          if obj.monitorStimulus 
+            device = obj.rig.getDevice(char(value));
+            streams = device.getInputStreams();
+            if isempty(streams)
+              setProperty@admin.core.LEDProtocol(obj,'monitorStimulus',false);
+              fprintf(2,'No input streams for %s (%s).\n',device.name,class(obj));
+            end
+          end
+        case 'led2'
+          if obj.monitorBackground 
+            device = obj.rig.getDevice(char(value));
+            streams = device.getInputStreams();
+            if isempty(streams)
+              setProperty@admin.core.LEDProtocol(obj,'monitorBackground',false);
+              fprintf(2,'No input streams for %s (%s).\n',device.name,class(obj));
+            end
+          end
       end
         
       % remove '_init' from name if it there. This won't affect property
