@@ -49,8 +49,8 @@ classdef ResponseWithFourier < admin.core.figures.DualAxes
       
       % compute fft
       fs = epoch.getResponse(obj.device).sampleRate.quantityInBaseUnits;
-      y_fft = hilbert(y);
-      y_fft = y_fft(:) - mean(y_fft);
+      y_fft = y(:);%hilbert(y);
+      y_fft = y_fft - mean(y_fft);
       NFFT = 2^nextpow2(length(y_fft));
       NFQ  = fix(NFFT/2)+1;
       Nyq = fs/2;
@@ -59,7 +59,7 @@ classdef ResponseWithFourier < admin.core.figures.DualAxes
       fq = linspace(0,1,NFQ)*Nyq;
       
       % fft and scale for power spectrum in each time bin
-      y_fft = 1/fs * abs(fft(y_fft,NFFT)).^2;
+      y_fft = 1/fs * abs(fft(y_fft,NFFT)*2).^2;
       
       % truncate to positive frequencies only.
       y_fft((NFQ+1):end,:) = [];

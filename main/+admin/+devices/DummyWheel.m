@@ -102,7 +102,11 @@ classdef DummyWheel < admin.core.devices.FilterWheelDevice
       end
       
       % create the object and connect to the device
+      pause(0.01);
       obj = obj@admin.core.devices.FilterWheelDevice(name,'dummy',inputs);
+      
+      % turn off current set listeners
+      obj.listeners.current.Enabled = false;
       
       % set erase property
       obj.eraseOnCleanup = eoc;
@@ -124,7 +128,7 @@ classdef DummyWheel < admin.core.devices.FilterWheelDevice
       
       % Construct Labels
       for w = 1:nWheels
-        obj.Wheel = w; % activate the wheel on the device
+        obj.Wheel = w;
         pMap = containers.Map();% position level
         pMap('ID') = wheelLabels{w};
         
@@ -148,6 +152,7 @@ classdef DummyWheel < admin.core.devices.FilterWheelDevice
           qPos = double(obj.query("pos"));
           obj.current_ = containers.Map(["wheel","position"],{w,qPos});
         end
+        
       end
       
       % move if we need to
@@ -158,6 +163,9 @@ classdef DummyWheel < admin.core.devices.FilterWheelDevice
       
       % reset verbose to desired
       obj.verbose = vb;
+      
+      % turn on current set listeners
+      obj.listeners.current.Enabled = true;
     end
     
     
