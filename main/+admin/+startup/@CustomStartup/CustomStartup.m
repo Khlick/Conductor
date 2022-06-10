@@ -5,7 +5,7 @@ classdef CustomStartup < appbox.Settings
   end
   
   properties (Constant=true)
-    version = 2.1
+    version = 2.2
   end
   
   properties (SetAccess = private)
@@ -138,6 +138,9 @@ classdef CustomStartup < appbox.Settings
     changeLabName(obj)
     updateUserSelection(obj,src,evt)
     locatePrevious(obj)
+    
+    updateColonyList(obj,src,evt)
+    importColonyList(obj,src,evt)
     
     function run(obj)
       % check that we have users and run add user is none
