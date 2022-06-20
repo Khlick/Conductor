@@ -5,7 +5,7 @@ classdef CustomStartup < appbox.Settings
   end
   
   properties (Constant=true)
-    version = 2.2
+    version = 2.3
   end
   
   properties (SetAccess = private)
@@ -168,6 +168,7 @@ classdef CustomStartup < appbox.Settings
     [institute,lab] = promptForLab()
     success = userCreator(root)
     id = getRigID(rigLocation)
+    [desc,preset] = presetBanks(userPreset,preset)
     
   end
   

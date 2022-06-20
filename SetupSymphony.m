@@ -7,75 +7,48 @@ import matlab.internal.apputil.AppUtil;
 packageRoot = fileparts(mfilename('fullpath'));
 
 % Locate Symphony and add it to the path
-infos = AppUtil.getAllAppsInDefaultLocation;
-if isempty(infos)
-  error( ...
-    "SETUPSYMPHONY:NOTINSTALLED", ...
-    "Install Symphony available from '%s'", ...
-    'https://symphony-das.github.io/' ...
-    );
+[importStatus,ME] = importSymphony();
+if strcmp(importStatus,'FAILED')
+  throw(ME);
 end
-
-appIndex = AppUtil.findAppIDs( ...
-  {infos.id}, ...
-  'SymphonyAPP', ...
-  false ...
-  );
-appInfo = infos(appIndex);
-
-% make sure Symphony is installed
-if isempty(appInfo)
-  error( ...
-    "SETUPSYMPHONY:NOTINSTALLED", ...
-    "Install Symphony available from '%s'", ...
-    'https://symphony-das.github.io/' ...
-    );
-end
-
-% app location string
-appinstalldir = appInfo.location;
-
-% generate the file path
-apppath = java.io.File(appinstalldir);
-
-resourcesfolder = matlab.internal.ResourcesFolderUtils.FolderName; 
-canonicalpathtocodedir = fullfile(char(apppath.getCanonicalPath()));
-allpaths = AppUtil.genpath(canonicalpathtocodedir);
-
-% do not allow resources or metadata folders to be added to the path
-allpaths = strsplit(allpaths,pathsep);
-allpaths(contains(allpaths,{resourcesfolder,'metadata'})) = [];
-
-% append the package folder to the path
-here = fullfile(packageRoot,'main');
-pathsToAdd = strjoin([allpaths,{genpath(here)}],pathsep);
-
-% add the app to the MATLAB path
-addpath(pathsToAdd);
 
 % check for symphony preferences
-if ~isempty(getpref('symphonyui'))
+symphonyPrefs = getpref('symphonyui');
+if ~isempty(symphonyPrefs)
   response = questdlg( ...
     'Reset Symphony preferences? (reccommended)', ...
     'Reset Symphony', ...
     'Yes','No','Yes' ...
     );
   if strcmp(response,'Yes')
-    rmpref('symphonyui');
+    if isfield(symphonyPrefs,'admin_startup_CustomStartup')
+      symphonyPrefs = rmfield(symphonyPrefs,'admin_startup_CustomStartup');
+      rmpref('symphonyui','admin_startup_CustomStartup');
+    end
+    pfields = fieldnames(symphonyPrefs);
+    for f = pfields.'
+      setpref('symphonyui',f{1},containers.Map());
+    end
+    symphonyPrefs = getpref('symphonyui');
   end
 end
 
 % import symphony settings and configure for our package
+if ~isfield(symphonyPrefs,'symphonyui_app_Options')
+  setpref('symphonyui','symphonyui_app_Options',containers.Map());
+end
 options = symphonyui.app.Options.getDefault();
 options.startupFile = fullfile(packageRoot,'SymphonyStartup.m');
 options.cleanupFile = fullfile(packageRoot,'SymphonyShutdown.m');
 options.warnOnViewOnlyWithOpenFile = false;
+options.searchPath = '';
+options.searchPathExclude = 'admin\.core\.\w*Protocol;admin\.descriptions\.*;';
 try %#ok<TRYNC>
   options.save();
 end
 
 % search for exisiting users
-userDirs = dir(fileparts(here));
+userDirs = dir(fileparts(packageRoot));
 userDirs(~[userDirs.isdir]) = [];
 userDirs = {userDirs.name}';
 isValidUser = ~ismember(userDirs,'main');
@@ -106,10 +79,8 @@ if showUC
   fprintf('Use the following dialog to create useres.\n');
   pause(1.2);
   % prompt for user creation
-  admin.startup.CustomStartup.userCreator(fileparts(here));
+  admin.startup.CustomStartup.userCreator(fileparts(packageRoot));
 end
 
-% remove symphony from the path
-rmpath(pathsToAdd);
 end
 

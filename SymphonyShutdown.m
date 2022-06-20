@@ -25,7 +25,7 @@ end
 
 userStruct = startupData.(userInfo.user);
 
-if strcmp(questdlg('Save current presets?', 'Ssve presets', 'Yes', 'No', 'Yes'),'Yes')
+if strcmp(questdlg('Save current presets?', 'Save presets', 'Yes', 'No', 'Yes'),'Yes')
   
   presets = symphonyui.app.Presets.getDefault();
   names = presets.getAvailableProtocolPresetNames;

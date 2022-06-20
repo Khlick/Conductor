@@ -18,21 +18,36 @@ userInfo = admin.startup.CustomStartup(rootPath);
 
 % collect lab name
 labName = userInfo.lab;
-
-if ~exist([labName,'.sy2'], 'file')
-  startupData = struct();
-else
-  % handle upgrade case. this will be removed in the future
-  try
-    load([labName,'.sy2'],'-mat','startupData');
-  catch
-    S = load([labName,'.sy2'],'-mat');
-    if isfield(S,'customStartup')
-      startupData = S.customStartup;
-    else
-      startupData = struct();
-    end
+labFile = [labName,'.sy2'];
+% if an older version of conductor was used, there will be a missing class in the
+% file leading to class:destructorError. Let's turn that warning into an error
+% temporariliy to catch it. If we catch it, it means 1) the files exists and 2) has
+% the wrong startup object. So we will backup that file (*.bak) and move on creating
+% a new one.
+s = warning('error','MATLAB:class:DestructorError');
+try
+  cx = matfile(labFile,'Writable',true);
+catch err
+  %err = lasterror;
+  % we are probably updating, let's backup the config file and create a new one.
+  if strcmpi(err.identifier,'MATLAB:class:DestructorError')
+    movefile(labFile,[labName,'.bak'],'f');
+    cx = matfile(labFile,'Writable',true);
   end
+end
+warning(s);  
+
+% rather than nesting if else, let's simply use try catch to get the startupData
+% variable. 
+try
+  % load up-to-date startupData struct
+  startupData = cx.startupData;
+catch me
+  % startupData not available, if acceptable exception caught, simply move on
+  if ~ismember(me.identifier,{'MATLAB:MatFile:NoFile','MATLAB:MatFile:VariableNotInFile'})
+    rethrow(me);
+  end
+  startupData = struct();
 end
 
 if ~isfield(startupData,userInfo.user)
@@ -64,6 +79,11 @@ userStruct.searchPath = strjoin( ...
   );
 
 % Set options
+% options variable is loaded in the symphonyui main function before this startup
+% script runs. Thus we have access to modify startup options as well as presets.
+% Typically symphonyui will recall the last used options and presets, but we want to
+% update the options and presets based on user and rig selection. Soon, preset banks
+% will be available
 %set options
 options.fileDefaultLocation = userStruct.fileDefaultLocation;
 options.searchPath = userStruct.searchPath;
@@ -99,13 +119,18 @@ end
 %save output
 startupData.(userInfo.user) = userStruct;
 userInfo.save();
-save([labName,'.sy2'],'startupData','userInfo','-v7.3');
+cx.startupData = startupData;
+cx.userInfo = userInfo;
 
-% remove main\+conductor
+% If previous version of conductor was used, let's remove main\+conductor folder to
+% prefer the ./+conductor package.
 contents = dir(fullfile(rootPath,'main','+*'));
 contents(contains({contents.name},'admin')) = [];
 if ~isempty(contents)
   rmdir(fullfile(contents.folder,contents.name),'s');
 end
 
+% change directory to the user / rig path and complete startup procedures
 cd(fullfile(rootPath,userInfo.user,userInfo.setup));
+
+pause(0.01);
